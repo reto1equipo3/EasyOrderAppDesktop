@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<GridPane fx:id="gpSignIn" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="easyorderappdesktop.ui.controller.SignInDesktopFxmlController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.20001220703125" minWidth="10.0" prefWidth="182.80001220703124" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="252.79997558593746" minWidth="10.0" prefWidth="236.39998779296874" />
+      <ColumnConstraints hgrow="SOMETIMES" maxWidth="181.60003662109375" minWidth="10.0" prefWidth="173.60003662109375" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints maxHeight="160.8" minHeight="10.0" prefHeight="147.00000610351563" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="75.60001220703126" minHeight="0.0" prefHeight="34.99999389648437" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="80.40000000000003" minHeight="10.0" prefHeight="33.20001831054688" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="80.40000000000003" minHeight="3.4000000000000057" prefHeight="33.999975585937506" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="102.80000000000001" minHeight="0.0" prefHeight="38.59998779296873" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="152.79999084472655" minHeight="10.0" prefHeight="117.39998779296877" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <ImageView fx:id="imgUser" fitHeight="137.0" fitWidth="128.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin>
+         <image>
+            <Image url="@../../../../../../../Downloads/defaultUserPhoto.png" />
+         </image>
+      </ImageView>
+      <TextField fx:id="txtLogin" promptText="Login" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+         <tooltip>
+            <Tooltip text="Enter login" />
+         </tooltip></TextField>
+      <PasswordField fx:id="pwdPassword" promptText="Password" GridPane.columnIndex="1" GridPane.rowIndex="2">
+         <tooltip>
+            <Tooltip text="Enter password" />
+         </tooltip></PasswordField>
+      <CheckBox fx:id="chkRememberLogin" mnemonicParsing="false" prefHeight="18.0" prefWidth="194.0" text="Remember Login" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin>
+         <tooltip>
+            <Tooltip text="CLick to remember my login" />
+         </tooltip>
+      </CheckBox>
+      <Button fx:id="btnSignIn" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="Sign In" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin>
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+         <tooltip>
+            <Tooltip text="Click to open the UserView that contains users data" />
+         </tooltip>
+      </Button>
+      <Separator prefHeight="2.0" prefWidth="382.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+         <GridPane.margin>
+            <Insets bottom="100.0" left="-90.0" right="-110.0" />
+         </GridPane.margin>
+      </Separator>
+      <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnSpan="3" GridPane.rowIndex="5">
+         <children>
+            <Hyperlink fx:id="hpSignUp" prefHeight="23.0" prefWidth="355.0" text="SignUp" textAlignment="RIGHT">
+               <graphic>
+                  <Label fx:id="lblSignUp" prefHeight="17.0" prefWidth="247.0" text="Do you not have an account yet? Click here to" />
+               </graphic>
+               <HBox.margin>
+                  <Insets left="110.0" top="20.0" />
+               </HBox.margin>
+               <padding>
+                  <Insets left="50.0" />
+               </padding>
+               <tooltip>
+                  <Tooltip text="Click to register in the aplication" />
+               </tooltip>
+            </Hyperlink>
+         </children>
+      </HBox>
+      <Label fx:id="lblErrorLogin" textFill="RED" GridPane.columnIndex="2" GridPane.rowIndex="1">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin>
+         <font>
+            <Font size="11.0" />
+         </font></Label>
+      <Label fx:id="lblErrorPass" textFill="RED" GridPane.columnIndex="2" GridPane.rowIndex="2">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin>
+         <font>
+            <Font size="11.0" />
+         </font></Label>
+   </children>
+</GridPane>
