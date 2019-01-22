@@ -1,12 +1,9 @@
 package easyorderappdesktop.ui.controller;
 
 import easyorderappdesktop.businessLogic.EmpleadoLogic;
+import easyorderappdesktop.transferObject.Empleado;
 import java.util.logging.Logger;
 import javafx.stage.Stage;
-
-import javafx.application.HostServices;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 
 /**
  * This is the base class for UI controllers in SignInSignUp app. It contains
@@ -68,31 +65,10 @@ public class GenericController {
 	public void setEmpleadoLogic(EmpleadoLogic empleadoLogic) {
 		this.empleadoLogic = empleadoLogic;
 	}
-	/**
-	 * {@link HostServices} object.
-	 */
-	protected HostServices hostServices;
 
-	/**
-	 * Sets the {@link HostServices} to reach them from controllers.
-	 *
-	 * @param hostServices Host services of the javafx application
-	 */
-	public void setHostServices(HostServices hostServices) {
-		this.hostServices = hostServices;
-	}
+	protected Empleado empleado;
 
-	/**
-	 * Shows an error message in an alert dialog.
-	 *
-	 * @param errorMsg The error message to be shown.
-	 */
-	protected void showErrorAlert(String errorMsg) {
-		//Shows error dialog.
-		Alert alert = new Alert(Alert.AlertType.ERROR,
-			errorMsg,
-			ButtonType.OK);
-		alert.showAndWait();
-
+	public void setEmpleado(Empleado empleado) {
+		this.empleado = empleado;
 	}
 }

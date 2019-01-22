@@ -1,7 +1,12 @@
 package easyorderappdesktop.ui.controller;
 
-import java.io.File;
+import easyorderappdesktop.businessLogic.BusinessLogicException;
+import easyorderappdesktop.transferObject.Empleado;
+import easyorderappdesktop.transferObject.UserPrivilege;
+import easyorderappdesktop.transferObject.UserStatus;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import javafx.beans.value.ObservableValue;
@@ -13,15 +18,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 
-import javafx.scene.image.ImageView;
-import javafx.stage.FileChooser;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -33,11 +36,13 @@ import javafx.stage.WindowEvent;
  */
 public class SignUpDesktopFxmlController extends GenericController {
 
+	@FXML
+	private GridPane gpSignUp;
 	/**
 	 * User's fullname UI text field.
 	 */
 	@FXML
-	private TextField txtFullName;
+	private TextField txtFullname;
 	/**
 	 * User's email UI text field.
 	 */
@@ -58,26 +63,11 @@ public class SignUpDesktopFxmlController extends GenericController {
 	 */
 	@FXML
 	private PasswordField pwdConfirmPassword;
-	/**
-	 * User's image UI image view.
-	 */
 	@FXML
-	private ImageView imgUserPhoto;
-	/**
-	 * Choose file button.
-	 */
+	private TextField txtTelefono;
 	@FXML
-	private Button btnChooseFile;
-	/**
-	 * Show terms of use hyperlink.
-	 */
-	@FXML
-	private Hyperlink hpTermsOfUse;
-	/**
-	 * Terms of use checkbox.
-	 */
-	@FXML
-	private CheckBox chkTermsOfUse;
+	private DatePicker dtpFechaDeNacimiento;
+
 	/**
 	 * Sign up button.
 	 */
@@ -91,8 +81,6 @@ public class SignUpDesktopFxmlController extends GenericController {
 	/**
 	 * Error label for fullname field.
 	 */
-	@FXML
-	private Label lblErrorFullName;
 	/**
 	 * Error label for email field.
 	 */
@@ -111,8 +99,9 @@ public class SignUpDesktopFxmlController extends GenericController {
 	/**
 	 * Error label for terms of use checkbox.
 	 */
-	@FXML
 	private Label lblErrorTermsOfUse;
+	@FXML
+	private Label lblErrorFullname;
 
 	/**
 	 * Method for initializing Sign Up Desktop View {@link Stage}.
@@ -133,11 +122,10 @@ public class SignUpDesktopFxmlController extends GenericController {
 		// Set window's events handlers
 		stage.setOnShowing(this::handleWindowShowing);
 		// Set control events handlers
-		txtFullName.textProperty().addListener(this::textChanged);
+		txtFullname.textProperty().addListener(this::textChanged);
 		txtEmail.textProperty().addListener(this::textChanged);
 		txtLogin.textProperty().addListener(this::textChanged);
 		pwdPassword.textProperty().addListener(this::textChanged);
-		chkTermsOfUse.selectedProperty().addListener(this::changed);
 		// Show window
 		stage.show();
 	}
@@ -149,11 +137,11 @@ public class SignUpDesktopFxmlController extends GenericController {
 	 * @param event The window event
 	 */
 	private void handleWindowShowing(WindowEvent event) {
-		LOGGER.info("SignUpDesktopFxmlController::handleWindowShowing: Setting default window state.");
+		LOGGER.info("SignUpDesktopFxmlController: Setting default window state.");
 
 		// Full name
-		lblErrorFullName.setVisible(false);
-		txtFullName.setStyle("");
+		lblErrorFullname.setVisible(false);
+		txtFullname.setStyle("");
 
 		// Email
 		txtEmail.setStyle("");
@@ -168,16 +156,20 @@ public class SignUpDesktopFxmlController extends GenericController {
 		pwdConfirmPassword.setStyle("");
 		lblErrorPassword.setVisible(false);
 
-		// Choose file
-		//imgUserPhoto.setImage(new Image("/signupsignindesktop/ui/img/defaultUserPhoto.png"));
-
-		// Terms of use
-		lblErrorTermsOfUse.setVisible(false);
-
 		btnSignUp.setMnemonicParsing(true);
-		btnSignUp.setText("_Sign Up");
+		btnSignUp.setText("_Darse de alta");
 		hpSignIn.setMnemonicParsing(true);
-		hpSignIn.setText("Sign _In");
+		hpSignIn.setText("_Iniciar sesión");
+
+		// TODO
+		// DELETE THIS
+		txtLogin.setText("imanol02");
+		txtEmail.setText("imanol02@gmail.com");
+		pwdPassword.setText("Abcd*1234");
+		pwdConfirmPassword.setText("Abcd*1234");
+		txtFullname.setText("imanol");
+		txtTelefono.setText("651511511");
+		dtpFechaDeNacimiento.setValue(LocalDate.now());
 	}
 
 	/**
@@ -190,9 +182,9 @@ public class SignUpDesktopFxmlController extends GenericController {
 	 */
 	private void textChanged(ObservableValue observable, String oldValue, String newValue) {
 		// Set fullname TextField to default
-		if (!txtFullName.getText().trim().isEmpty()) {
-			txtFullName.setStyle("");
-			lblErrorFullName.setVisible(false);
+		if (!txtFullname.getText().trim().isEmpty()) {
+			txtFullname.setStyle("");
+			lblErrorFullname.setVisible(false);
 		}
 		// Set email TextField to default
 		if (!txtEmail.getText().trim().isEmpty()) {
@@ -210,66 +202,6 @@ public class SignUpDesktopFxmlController extends GenericController {
 			pwdConfirmPassword.setStyle("");
 			lblErrorPassword.setVisible(false);
 		}
-	}
-
-	/**
-	 * Changed event handler. It changes de error labels to default.
-	 *
-	 * @param observable The value being observed.
-	 * @param oldValue The old value of the observable.
-	 * @param newValue The new value of the observable.
-	 */
-	private void changed(ObservableValue observable, Boolean oldValue, Boolean newValue) {
-		if (chkTermsOfUse.isSelected()) {
-			lblErrorTermsOfUse.setVisible(false);
-		}
-	}
-
-	/**
-	 * Action event handler for ChooseFile button. It opens a dialog window to
-	 * select an image file.
-	 *
-	 * @param event The Action event
-	 */
-	@FXML
-	private void handleChooseFileAction(ActionEvent event) {
-		LOGGER.info("SignUpDesktopFxmlController::handleChooseFileAction: Beggining choose file action.");
-		FileChooser fileChooser = new FileChooser();
-		// Set extension filter
-		FileChooser.ExtensionFilter extFilterImages = new FileChooser.ExtensionFilter("Image files (*.JPG, *.jpg, *.JPEG, *.jpeg, *.PNG, *.png)", "*.JPG", "*.jpg", "*.JPEG", "*.jpeg", "*.PNG", "*.png");
-		fileChooser.getExtensionFilters().addAll(extFilterImages);
-		// Open dialog to choose a file
-		File file = fileChooser.showOpenDialog(stage);
-
-		// If the chosen file is valid show it
-		if (file != null) {
-			Image image = new Image(file.toURI().toString());
-			imgUserPhoto.setImage(image);
-		} else {
-			imgUserPhoto.setImage(new Image("/signupsignindesktop/ui/img/defaultUserPhoto.png"));
-		}
-	}
-
-	/**
-	 * Action event handler for TermsOfUse hyperlink. It opens the terms of use
-	 * document in the default browser.
-	 *
-	 * @param event The Action event
-	 */
-	@FXML
-	private void handleShowTermsOfUseAction(ActionEvent event) {
-		LOGGER.info("SignUpDesktopFxmlController::handleShowTermsOfUseAction: Beggining show terms of use action.");
-
-		Alert alert = new Alert(Alert.AlertType.INFORMATION); // Change alert type to CONFIRMATION
-		alert.setHeaderText(null);
-		alert.setContentText("This feature is not implemented yet. Sorry for the inconvenience.");
-		alert.showAndWait();
-
-		// Uncomment this when HostServices' show document path problems are resolved
-		/*
-		alert.setContentText("New browser window will be opened. Do you agree?");
-		alert.showAndWait().filter(response -> response == ButtonType.OK).ifPresent(response -> hostServices.showDocument("file:///C:/Users/iRoib/Documents/NetBeansProjects/SignUpSignInDesktop/src/signupsignindesktop/ui/img/TermsOfUse.pdf"));
-		 */
 	}
 
 	/**
@@ -384,20 +316,11 @@ public class SignUpDesktopFxmlController extends GenericController {
 	 */
 	@FXML
 	private void handleSignUpAction(ActionEvent event) {
-		LOGGER.info("SignUpDesktopFxmlController::handleSignUpAction: Beginning signing up action.");
+		LOGGER.info("SignUpDesktopFxmlController: Signing up action.");
 
 		// Boolean to check if all fields are filled correctly
 		boolean validFields = true;
 
-		// Validate terms of use
-		if (!chkTermsOfUse.isSelected()) {
-			LOGGER.log(Level.SEVERE, "Sign Up controller::handleSignUpAction: Terms of use not accepted.");
-
-			lblErrorTermsOfUse.setText("* Required");
-			lblErrorTermsOfUse.setVisible(true);
-
-			validFields = false;
-		}
 		// Validate password
 		try {
 			validatePassword(pwdPassword.getText(), pwdConfirmPassword.getText());
@@ -443,42 +366,54 @@ public class SignUpDesktopFxmlController extends GenericController {
 		}
 		// Validate full name
 		try {
-			validateFullname(txtFullName.getText());
+			validateFullname(txtFullname.getText());
 		} catch (IllegalArgumentException e) {
 			LOGGER.log(Level.SEVERE, "Sign Up controller::handleSignUpAction: {0}", e.getMessage());
 
-			lblErrorFullName.setText(e.getMessage());
-			lblErrorFullName.setVisible(true);
+			lblErrorFullname.setText(e.getMessage());
+			lblErrorFullname.setVisible(true);
 
-			txtFullName.setStyle("-fx-border-color:red;");
-			txtFullName.requestFocus();
+			txtFullname.setStyle("-fx-border-color:red;");
+			txtFullname.requestFocus();
 
 			validFields = false;
 		}
 		// If all fields are filled correctly sign up the user
 		if (validFields) {
-			// Create a UserBean to encapsulate all the data
-			/*UserBean user = new UserBean();
-			user.setFullName(txtFullName.getText());
-			user.setEmail(txtEmail.getText());
-			user.setLogin(txtLogin.getText());
-			user.setPassword(pwdPassword.getText());
-			if (imgUserPhoto != null || imgUserPhoto.getImage() != null) {
-//				user.setPhoto(imgUserPhoto.getImage());
-			}
-			// Send the user to the business logic
-			try {
-				logic.signUp(user);
+			// Create an employee to encapsulate all the data
+			Empleado empleado = new Empleado();
+			empleado.setLogin(txtLogin.getText());
+			empleado.setEmail(txtEmail.getText());
+			empleado.setPassword(pwdPassword.getText());
+			empleado.setFullname(txtFullname.getText());
+			empleado.setFechaDeNacimiento(new Date(dtpFechaDeNacimiento.getValue().toEpochDay()));
+			empleado.setTelefono(txtTelefono.getText());
 
+			empleado.setStatus(UserStatus.ENABLED);
+			empleado.setPrivilege(UserPrivilege.USER);
+			empleado.setLastAccess(new Date());
+			empleado.setLastPasswordChange(new Date());
+
+			// Sign up the new employee
+			try {
+				LOGGER.log(Level.INFO, "SignUpDesktopFxmlController: Signing up employee {0}.", empleado.getLogin());
+				empleadoLogic.createEmpleado(empleado);
+				LOGGER.log(Level.INFO, "SignUpDesktopFxmlController: Signed up employee.");
 				Alert alert = new Alert(Alert.AlertType.INFORMATION);
 				alert.setHeaderText(null);
-				alert.setContentText("Congratulations! New user signed up correctly.");
-
+				alert.setContentText("¡Felicidades! El empleado " + empleado.getLogin() + " se ha dado de alta correctamente.");
 				alert.showAndWait().filter(response -> response == ButtonType.OK).ifPresent(response -> stage.hide());
 
-				// If user is signed up correctly open sign in window
+				// If user is signed up correctly open SignIn window
 				openSignInWindow();
+			} catch (BusinessLogicException ex) {
+				LOGGER.log(Level.SEVERE, "SignUpDesktopFxmlController: Exception signing up employee, {0}.", ex.getMessage());
 
+				// TODO
+				// Show an error feedback
+			}
+
+			/*
 			} catch (LoginExistingException e) {
 				LOGGER.log(Level.SEVERE, "Sign Up controller::handleSignUpAction: {0}", e.getMessage());
 				lblErrorLogin.setText("* Login already exists.");
@@ -495,7 +430,7 @@ public class SignUpDesktopFxmlController extends GenericController {
 				alert.setContentText("Sorry, something went wrong. Try again.");
 				alert.showAndWait();
 			}
-			*/
+			 */
 		}
 	}
 
@@ -503,7 +438,7 @@ public class SignUpDesktopFxmlController extends GenericController {
 	 * Opens Sign In window.
 	 */
 	private void openSignInWindow() {
-		LOGGER.info("SignUpDesktopFxmlController::openSignInWindow: Beginning open sign in window action.");
+		LOGGER.info("SignUpDesktopFxmlController: Opening SignIn window action.");
 		try {
 			// Load node graph from fxml file
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/easyorderappdesktop/ui/fxml/SignInDesktopFXMLDocument.fxml"));
@@ -515,10 +450,8 @@ public class SignUpDesktopFxmlController extends GenericController {
 			controller.initStage(root);
 			// Hide sign up stage
 			//stage.hide();
-		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE,
-				"UI SignUpDesktopFxmlController: Error opening sign in window.",
-				e.getMessage());
+		} catch (IOException ex) {
+			LOGGER.log(Level.SEVERE, "SignUpDesktopFxmlController: Error opening SignIn window.", ex.getMessage());
 		}
 	}
 
@@ -529,7 +462,7 @@ public class SignUpDesktopFxmlController extends GenericController {
 	 */
 	@FXML
 	private void handleSignInAction(ActionEvent event) {
-		LOGGER.info("SignUpDesktopFxmlController::handleSignInAction: Beginning sign in action.");
+		LOGGER.info("SignUpDesktopFxmlController: Opening SignIn action.");
 		openSignInWindow();
 	}
 }

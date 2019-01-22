@@ -12,8 +12,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="576.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="easyorderappdesktop.ui.controller.EmpleadoDesktopFxmlController">
    <children>
       <GridPane layoutX="224.0" layoutY="1.0" prefHeight="576.0" prefWidth="800.0">
         <columnConstraints>
@@ -38,16 +37,16 @@
             <Label text="Fullname:" GridPane.rowIndex="4" />
             <Label text="Fecha de nacimiento:" GridPane.rowIndex="5" />
             <Label text="Teléfono:" GridPane.rowIndex="6" />
-            <Hyperlink text="Cambiar contraseña" GridPane.rowIndex="7" />
-            <TextField promptText="Login" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <TextField promptText="Email" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <TextField promptText="Fullname" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <TextField promptText="Teléfono" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-            <DatePicker promptText="Fecha de Nacimiento" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <Hyperlink fx:id="hpCambiarContrasegna" text="Cambiar contraseña" GridPane.rowIndex="7" />
+            <TextField fx:id="txtLogin" editable="false" promptText="Login" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="txtEmail" editable="false" promptText="Email" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="txtFullname" editable="false" promptText="Fullname" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <DatePicker fx:id="dtpFechaDeNacimiento" editable="false" promptText="Fecha de Nacimiento" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <TextField fx:id="txtTelefono" editable="false" promptText="Teléfono" GridPane.columnIndex="1" GridPane.rowIndex="6" />
             <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
                <children>
-                  <Button mnemonicParsing="false" text="Editar" />
-                  <Button mnemonicParsing="false" text="Eliminar" />
+                  <Button fx:id="btnEditarGuardar" mnemonicParsing="false" onAction="#handleEditarGuardarAction" text="Editar" />
+                  <Button fx:id="btnEliminarCancelar" mnemonicParsing="false" onAction="#handleEliminarCancelarAction" text="Eliminar" />
                </children>
             </HBox>
          </children>

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package easyorderappdesktop.ui.controller;
 
 import easyorderappdesktop.businessLogic.BusinessLogicException;
@@ -24,16 +19,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -90,10 +85,12 @@ public class SignInDesktopFxmlController extends GenericController {
 	 */
 	@FXML
 	private Label lblErrorPass;
-
-	public void setEmpleado(Empleado empleado) {
-		this.empleado = empleado;
-	}
+	@FXML
+	private GridPane gpSignIn;
+	@FXML
+	private Hyperlink hpForgottenPassword;
+	@FXML
+	private Label lblSignUp;
 
 	/**
 	 * Create new Text file to save the Login
@@ -114,7 +111,7 @@ public class SignInDesktopFxmlController extends GenericController {
 		stage.setScene(scene);
 
 		//Set window title
-		stage.setTitle("Sign In");
+		stage.setTitle("Iniciar sesión");
 
 		//Set window size
 		stage.setResizable(false);
@@ -149,10 +146,13 @@ public class SignInDesktopFxmlController extends GenericController {
 		btnSignIn.setTooltip(new Tooltip("Rellena los campos login y password para habilitar el boton"));
 
 		btnSignIn.setMnemonicParsing(true);
-		btnSignIn.setText("_Sign In");
+		btnSignIn.setText("_Iniciar Sesión");
 
 		hpSignUp.setMnemonicParsing(true);
-		hpSignUp.setText("Sign _Up");
+		hpSignUp.setText("Darse de alta");
+
+		txtLogin.setText("imanol02");
+		pwdPassword.setText("Abcd*1234");
 
 	}
 
@@ -163,7 +163,6 @@ public class SignInDesktopFxmlController extends GenericController {
 	 *
 	 * @param event The Action event
 	 */
-	@FXML
 	private void handleSignInAction(ActionEvent event) {
 		LOGGER.info("SignInDesktopFxmlController: Signing In action.");
 
@@ -172,7 +171,13 @@ public class SignInDesktopFxmlController extends GenericController {
 			if (chkRememberLogin.isSelected()) {
 				RememberUserLogin();
 			}
-			GoToUserView();
+			//GoToUserView();
+				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+				alert.setHeaderText(null);
+				alert.setContentText("¡Felicidades! El empleado " + empleado.getLogin() + " ha iniciado sesión correctamente.");
+				alert.showAndWait().filter(response -> response == ButtonType.OK);
+
+				GoToEmpleadoView();
 		} catch (BusinessLogicException ex) {
 			LOGGER.log(Level.SEVERE, "SignInDesktopFxmlController: Exception signing in employee, {0}", ex.getMessage());
 
@@ -198,12 +203,16 @@ public class SignInDesktopFxmlController extends GenericController {
 		}
 	}
 
+	@FXML
+	private void handleForgottenPassword(ActionEvent event) {
+
+	}
+
 	/**
 	 * Action event handler for SignUp hyperlink. It opens the SignUp window.
 	 *
 	 * @param event The Action event
 	 */
-	@FXML
 	private void handleSignUpAction(ActionEvent event) {
 		LOGGER.info("SignInDesktopFxmlController: Signin up action.");
 		try {
@@ -279,22 +288,19 @@ public class SignInDesktopFxmlController extends GenericController {
 	 * Method to open UserView window
 	 *
 	 */
-	private void GoToUserView() {
-		// TODO
-		// Ir a la vista VERPERFILEMPLEADO
-		/*
+	private void GoToEmpleadoView() {
 		try {
 			//Load node graph from fxml file 
 			FXMLLoader loader
-				= new FXMLLoader(getClass().getResource("/signupsignindesktop/ui/fxml/UserViewDesktopFXMLDocument.fxml"));
+				= new FXMLLoader(getClass().getResource("/easyorderappdesktop/ui/fxml/EmpleadoDesktopFXMLDocument.fxml"));
 
 			Parent root = loader.load();
 
 			//Get controller for graph 
-			UserViewDesktopFxmlController controller
-				= ((UserViewDesktopFxmlController) loader.getController());
-			controller.setLogic(logic);
-			controller.setUser(user);
+			EmpleadoDesktopFxmlController controller
+				= ((EmpleadoDesktopFxmlController) loader.getController());
+			controller.setEmpleadoLogic(empleadoLogic);
+			controller.setEmpleado(empleado);
 
 			//Initializes stage
 			controller.initStage(root);
@@ -307,7 +313,6 @@ public class SignInDesktopFxmlController extends GenericController {
 				e.getMessage());
 
 		}
-		 */
 	}
 
 	/**

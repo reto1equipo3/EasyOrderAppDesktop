@@ -68,6 +68,7 @@ public class Empleado implements Serializable {
 		this.fechaDeNacimiento = fechaDeNacimiento;
 	}
 
+
 	public int getId() {
 		return this.id.get();
 	}
@@ -202,6 +203,7 @@ public class Empleado implements Serializable {
 		}
 		return true;
 	}
+
 	/**
 	 * This method returns a String representation for an employee entity
 	 * instance.
