@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -27,7 +28,6 @@ public class FTPLogicImplementation implements FTPLogic {
 	private final int PORT = Integer.parseInt(ResourceBundle.getBundle("easyorderappdesktop.config.parameters").getString("ftp.port"));
 	private final String USERNAME = ResourceBundle.getBundle("easyorderappdesktop.config.parameters").getString("ftp.username");
 	private final String PASSWORD = ResourceBundle.getBundle("easyorderappdesktop.config.parameters").getString("ftp.password");
-	private final String DESTINO = ResourceBundle.getBundle("easyorderappdesktop.config.parameters").getString("ftp.destino");
 
 	@Override
 	public void iniciarSesion() {
@@ -79,7 +79,7 @@ public class FTPLogicImplementation implements FTPLogic {
 
 	@Override
 	public ArrayList<MyFtpFile> listarFicheros(String path) {
-		LOGGER.log(Level.INFO,"FTPLogicImplementation: Listando ficheros path={0}.", path);
+		LOGGER.log(Level.INFO, "FTPLogicImplementation: Listando ficheros path={0}.", path);
 		FTPFile[] ftpFiles = null;
 		ArrayList<MyFtpFile> myFtpFiles = new ArrayList<>();
 
@@ -107,40 +107,34 @@ public class FTPLogicImplementation implements FTPLogic {
 	}
 
 	@Override
-	public void borrarDirectorio(String path) {
+	public boolean borrarDirectorio(String path) {
+		boolean deleted = false;
 		try {
-			ftp.removeDirectory(path);
+			deleted = ftp.removeDirectory(path);
 		} catch (IOException ex) {
 			Logger.getLogger(FTPLogicImplementation.class.getName()).log(Level.SEVERE, null, ex);
 		}
+		return deleted;
 	}
 
 	@Override
-	public void descargarArchivo(String path) {
-		FileOutputStream fileOutputStream = null;
+	public boolean descargarArchivo(String path, OutputStream destino) {
+		boolean downloaded = false;
 		try {
-			fileOutputStream = new FileOutputStream(DESTINO);
-			ftp.retrieveFile(path, fileOutputStream);
+			downloaded = ftp.retrieveFile(path, destino);
 		} catch (IOException ex) {
 			Logger.getLogger(FTPLogicImplementation.class.getName()).log(Level.SEVERE, null, ex);
-		} finally {
-			try {
-				if (fileOutputStream != null) {
-					fileOutputStream.close();
-				}
-			} catch (IOException ex) {
-				Logger.getLogger(FTPLogicImplementation.class.getName()).log(Level.SEVERE, null, ex);
-			}
 		}
-
+		return downloaded;
 	}
 
 	@Override
-	public void agnadirArchivo(String path, File file) {
+	public boolean subirArchivo(String path, File file) {
 		FileInputStream fileInputStream = null;
+		boolean uploaded = false;
 		try {
 			fileInputStream = new FileInputStream(file);
-			ftp.storeFile(path, fileInputStream);
+			uploaded = ftp.storeFile(path + file.getName(), fileInputStream);
 		} catch (IOException ex) {
 			Logger.getLogger(FTPLogicImplementation.class.getName()).log(Level.SEVERE, null, ex);
 		} finally {
@@ -152,15 +146,19 @@ public class FTPLogicImplementation implements FTPLogic {
 				Logger.getLogger(FTPLogicImplementation.class.getName()).log(Level.SEVERE, null, ex);
 			}
 		}
+
+		return uploaded;
 	}
 
 	@Override
-	public void borrarArchivo(String path) {
+	public boolean borrarArchivo(String path) {
+		boolean deleted = false;
 		try {
-			ftp.deleteFile(path);
+			deleted = ftp.deleteFile(path);
 		} catch (IOException ex) {
 			Logger.getLogger(FTPLogicImplementation.class.getName()).log(Level.SEVERE, null, ex);
 		}
+		return deleted;
 	}
 
 }

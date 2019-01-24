@@ -2,9 +2,11 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
@@ -25,10 +27,16 @@
         </rowConstraints>
          <children>
             <TreeView fx:id="trvFacturas" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" GridPane.rowSpan="3" />
-            <Button fx:id="btnSubir" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="Subir" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <Button fx:id="btnDescargar" mnemonicParsing="false" text="Descargar" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <Button fx:id="btnEliminar" mnemonicParsing="false" text="Eliminar" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Button fx:id="btnSubir" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleSubirAction" text="Subir" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Button fx:id="btnDescargar" mnemonicParsing="false" onAction="#handleDescargarAction" text="Descargar" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Button fx:id="btnEliminar" mnemonicParsing="false" onAction="#handleEliminarAction" text="Eliminar" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <Label text="Facturas FTP" />
+            <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="4">
+               <children>
+                  <Button fx:id="btnCrearDirectorio" mnemonicParsing="false" onAction="#handleCrearDirectorioAction" text="Crear directorio" />
+                  <TextField fx:id="txtDirectorio" promptText="Nombre directorio" />
+               </children>
+            </HBox>
          </children>
       </GridPane>
       <VBox layoutX="56.0" layoutY="163.0" prefHeight="411.0" prefWidth="134.0">
