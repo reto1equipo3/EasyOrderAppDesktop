@@ -37,7 +37,7 @@
             <Label text="Fullname:" GridPane.rowIndex="4" />
             <Label text="Fecha de nacimiento:" GridPane.rowIndex="5" />
             <Label text="Teléfono:" GridPane.rowIndex="6" />
-            <Hyperlink fx:id="hpCambiarContrasegna" text="Cambiar contraseña" GridPane.rowIndex="7" />
+            <Hyperlink fx:id="hpCambiarContrasegna" onAction="#handleCambiarContrasegnaAction" text="Cambiar contraseña" GridPane.rowIndex="7" />
             <TextField fx:id="txtLogin" editable="false" promptText="Login" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <TextField fx:id="txtEmail" editable="false" promptText="Email" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <TextField fx:id="txtFullname" editable="false" promptText="Fullname" GridPane.columnIndex="1" GridPane.rowIndex="4" />

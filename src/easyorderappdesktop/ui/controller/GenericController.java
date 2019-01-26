@@ -24,7 +24,7 @@ public class GenericController {
 	protected final int MAX_LENGTH_FULLNAME = 50;
 	protected final int MAX_LENGTH_EMAIL = 50;
 	protected final int MAX_LENGTH_LOGIN = 20;
-	protected final int MAX_LENGTH_PASSWORD = 15;
+	protected final int MAX_LENGTH_PASSWORD = 10;
 	protected final int MIN_LENGTH_PASSWORD = 6;
 	/**
 	 * The stage object associated to the Scene controlled by this controller.

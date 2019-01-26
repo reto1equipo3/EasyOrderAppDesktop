@@ -61,7 +61,7 @@ public class EmpleadoLogicImplementation implements EmpleadoLogic {
 	public Empleado inicioSesion(String login, String password) throws BusinessLogicException {
 
 		Empleado empleado = null;
-		
+
 		try {
 			LOGGER.log(Level.INFO, "EmpleadoLogic: Signing in employee {0}.", login);
 			password = Crypto.encryptPassword(password);
@@ -76,13 +76,37 @@ public class EmpleadoLogicImplementation implements EmpleadoLogic {
 	}
 
 	@Override
-	public Empleado recuperarContrasegna(Empleado empleado) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	public void recuperarContrasegna(String login) throws BusinessLogicException {
+		LOGGER.log(Level.INFO, "EmpleadoLogic: Restoring password.");
+
+		Empleado empleado = null;
+		try {
+			webClient.recuperarContrasegna(Empleado.class, login);
+
+		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, "Exception restoring password, {0}.", ex.getMessage());
+			throw new BusinessLogicException("Error restoring password:\n" + ex.getMessage());
+		}
+		LOGGER.log(Level.INFO, "EmpleadoLogic: Restored password.");
 	}
 
 	@Override
-	public Empleado cambiarContrasegna(Empleado empleado) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	public Empleado cambiarContrasegna(String login, String actualPassword, String nuevaPassword) throws BusinessLogicException {
+		LOGGER.log(Level.INFO, "EmpleadoLogic: Changing password employee {0}...", login);
+
+		Empleado empleado = null;
+		try {
+			actualPassword = Crypto.encryptPassword(actualPassword);
+			nuevaPassword = Crypto.encryptPassword(nuevaPassword);
+			empleado = webClient.cambiarContrasegna(Empleado.class, login, actualPassword, nuevaPassword);
+		} catch (Exception ex) {
+			LOGGER.log(Level.SEVERE, "Exception changing password, {0}.", ex.getMessage());
+			throw new BusinessLogicException("Error changing password:\n" + ex.getMessage());
+
+		}
+
+		LOGGER.log(Level.INFO, "EmpleadoLogic: Changed password employee {0}.", login);
+		return empleado;
 	}
 
 }

@@ -151,7 +151,7 @@ public class SignInDesktopFxmlController extends GenericController {
 		hpSignUp.setMnemonicParsing(true);
 		hpSignUp.setText("Darse de alta");
 
-		txtLogin.setText("imanol02");
+		txtLogin.setText("imanoltxu");
 		pwdPassword.setText("Abcd*1234");
 
 	}
@@ -205,6 +205,17 @@ public class SignInDesktopFxmlController extends GenericController {
 
 	@FXML
 	private void handleForgottenPassword(ActionEvent event) {
+		LOGGER.info("SignInDesktopFxmlController: Handling forgotten password...");
+
+		try {
+			empleadoLogic.recuperarContrasegna(txtLogin.getText());
+		} catch (BusinessLogicException ex) {
+			LOGGER.log(Level.SEVERE, "SignInFxmlController: Exception restoring password, {0}.", ex.getMessage());
+			// TODO
+			// UI Feedback
+		}
+		
+		LOGGER.info("SignInDesktopFxmlController: Handled forgotten password.");
 
 	}
 
@@ -278,8 +289,8 @@ public class SignInDesktopFxmlController extends GenericController {
 			txtLogin.setText(txtLogin.getText().substring(0, 20));
 		}
 		//Limit the number of characters on the Password passwordField
-		if (pwdPassword.getLength() == 16) {
-			pwdPassword.setText(pwdPassword.getText().substring(0, 15));
+		if (pwdPassword.getLength() == 10) {
+			pwdPassword.setText(pwdPassword.getText().substring(0, 10));
 		}
 
 	}

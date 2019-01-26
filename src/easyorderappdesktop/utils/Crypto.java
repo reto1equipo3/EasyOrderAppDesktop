@@ -11,8 +11,10 @@ import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
@@ -27,6 +29,7 @@ import javax.xml.bind.DatatypeConverter;
  */
 public class Crypto {
 	
+	private static final Logger LOGGER = Logger.getLogger("easyorderappserver");
 	public static String encryptPassword(String password) {
 		String encryptedPassword = null;
 
@@ -75,4 +78,5 @@ public class Crypto {
 		Logger.getLogger("easyorderappclient").log(Level.INFO, "Crypto: Password encrypted.");
 		return encryptedPassword;
 	}
+
 }

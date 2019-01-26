@@ -8,7 +8,6 @@ package easyorderappdesktop.rest;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
 
 /**
  * Jersey REST client generated for REST resource:EmpleadoREST [empleado]<br>
@@ -24,8 +23,8 @@ import javax.ws.rs.core.GenericType;
  */
 public class EmpleadoRESTClient {
 
-	private final WebTarget webTarget;
-	private final Client client;
+	private WebTarget webTarget;
+	private Client client;
 	private static final String BASE_URI = "http://localhost:8080/EasyOrderAppServer/webresources";
 
 	public EmpleadoRESTClient() {
@@ -53,13 +52,25 @@ public class EmpleadoRESTClient {
 		return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
 	}
 
-	public <T> T findAll(GenericType<T> responseType) throws ClientErrorException {
+	public <T> T cambiarContrasegna(Class<T> responseType, String login, String actualPassword, String nuevaPassword) throws ClientErrorException {
+		WebTarget resource = webTarget;
+		resource = resource.path(java.text.MessageFormat.format("login/{0}/{1}/{2}", new Object[]{login, actualPassword, nuevaPassword}));
+		return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+	}
+
+	public <T> T findAll(Class<T> responseType) throws ClientErrorException {
 		WebTarget resource = webTarget;
 		return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
 	}
 
 	public void delete(String id) throws ClientErrorException {
 		webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
+	}
+
+	public <T> T recuperarContrasegna(Class<T> responseType, String login) throws ClientErrorException {
+		WebTarget resource = webTarget;
+		resource = resource.path(java.text.MessageFormat.format("login/{0}", new Object[]{login}));
+		return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
 	}
 
 	public void close() {

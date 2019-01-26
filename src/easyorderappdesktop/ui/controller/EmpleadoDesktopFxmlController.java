@@ -186,4 +186,22 @@ public class EmpleadoDesktopFxmlController extends GenericController {
 		}
 	}
 
+	@FXML
+	private void handleCambiarContrasegnaAction(ActionEvent event) {
+		LOGGER.info("EmpleadoDesktopFxmlController: Handling cambiar contrasegna action...");
+
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/easyorderappdesktop/ui/fxml/CambiarContrasegnaFXMLDocument.fxml"));
+			Parent root = (Parent) loader.load();
+			CambiarContrasegnaFxmlController controller = ((CambiarContrasegnaFxmlController) loader.getController());
+			controller.setEmpleadoLogic(empleadoLogic);
+			controller.setEmpleado(empleado);
+			controller.initStage(root);
+		} catch (IOException ex) {
+			LOGGER.log(Level.SEVERE, "EmpleadoDesktopFxmlController: Error opening cambiar contrasegna window, {0}.", ex.getMessage());
+		}
+
+		LOGGER.info("EmpleadoDesktopFxmlController: Handled cambiar contrasegna action.");
+	}
+
 }

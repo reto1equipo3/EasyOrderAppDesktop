@@ -16,8 +16,8 @@ public interface EmpleadoLogic {
 
 	public Empleado inicioSesion(String login, String password) throws BusinessLogicException;
 
-	public Empleado recuperarContrasegna(Empleado empleado);
+	public void recuperarContrasegna(String login) throws BusinessLogicException;
 
-	public Empleado cambiarContrasegna(Empleado empleado);
+	public Empleado cambiarContrasegna(String login, String actualPassword, String nuevaPassword) throws BusinessLogicException;
 
 }
