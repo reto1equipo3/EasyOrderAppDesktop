@@ -1,20 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package easyorderappdesktop.ui.controller;
 
+import easyorderappdesktop.businessLogic.BusinessLogicException;
 import easyorderappdesktop.businessLogic.FTPLogic;
 import easyorderappdesktop.businessLogic.FTPLogicFactory;
 import easyorderappdesktop.transferObject.MyFtpFile;
+import easyorderappdesktop.utils.MyAlert;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -32,29 +28,57 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 /**
- * FXML Controller class
+ * FXML Controller class for ftp management view. It contains event handlers and
+ * initialization code for the view defined in FacturasDesktopFXMLDocument.fxml
+ * file.
  *
  * @author Imanol
  */
 public class FacturasDesktopFxmlController extends GenericController {
 
+	/**
+	 * FTP content tree view.
+	 */
 	@FXML
 	private TreeView<MyFtpFile> trvFacturas;
+	/**
+	 * Upload file button.
+	 */
 	@FXML
 	private Button btnSubir;
+	/**
+	 * Download file button.
+	 */
 	@FXML
 	private Button btnDescargar;
+	/**
+	 * Delete file button.
+	 */
 	@FXML
 	private Button btnEliminar;
-
-	private final FTPLogic ftpLogic = FTPLogicFactory.createFTPLogicImplementation();
+	/**
+	 * Create directory button.
+	 */
 	@FXML
 	private Button btnCrearDirectorio;
+	/**
+	 * Directory name text field.
+	 */
 	@FXML
 	private TextField txtDirectorio;
 
+	/**
+	 * FTPLogic object.
+	 */
+	private FTPLogic ftpLogic;
+
+	/**
+	 * Method for initializating FTPFacturas stage.
+	 *
+	 * @param root The Parent object representing root node of view graph.
+	 */
 	public void initStage(Parent root) {
-		LOGGER.info("FacturasDesktopFxmlController: Initializing stage.");
+		LOGGER.info("FacturasDesktopFxmlController: Initializing stage...");
 
 		// Create a scene associated to the node graph root	
 		Scene scene = new Scene(root);
@@ -69,12 +93,20 @@ public class FacturasDesktopFxmlController extends GenericController {
 		stage.setOnShowing(this::handleWindowShowing);
 		// Set control events handlers
 
+		ftpLogic = FTPLogicFactory.createFTPLogicImplementation();
 		ftpLogic.iniciarSesion();
 		// Show window
 		stage.show();
 
+		LOGGER.info("FacturasDesktopFxmlController: Initialized stage.");
 	}
 
+	/**
+	 * This method add leaves to a branch item.
+	 *
+	 * @param branchItem The branch item
+	 * @return The branch with its leaves.
+	 */
 	private TreeItem addLeaves(TreeItem<MyFtpFile> branchItem) {
 		ArrayList<MyFtpFile> branch = ftpLogic.listarFicheros(branchItem.getValue().getAbsolutePath());
 
@@ -100,11 +132,28 @@ public class FacturasDesktopFxmlController extends GenericController {
 		trvFacturas.setRoot(addLeaves(rootItem));
 	}
 
+	/**
+	 * Initializes window state.
+	 *
+	 * @param event The window event.
+	 */
 	private void handleWindowShowing(WindowEvent event) {
-		LOGGER.info("FacturasDesktopFxmlController: Setting default window state.");
-		setTreeView();
+		LOGGER.info("FacturasDesktopFxmlController: Setting default window state...");
+		// Set tree view
+		// Create a custom file object for root
+		MyFtpFile ftpRoot = new MyFtpFile("", "/", true);
+		// Create a TreeItem for root with custom file object
+		TreeItem<MyFtpFile> rootItem = new TreeItem<>(ftpRoot);
+		rootItem.setExpanded(true);
+
+		trvFacturas.setRoot(addLeaves(rootItem));
 	}
 
+	/**
+	 * Action event handler for upload button.
+	 *
+	 * @param event The ActionEvent object for the event.
+	 */
 	@FXML
 	private void handleSubirAction(ActionEvent event) {
 		LOGGER.info("FacturasDesktopFxmlController: Handling subir archivo action...");
@@ -113,23 +162,37 @@ public class FacturasDesktopFxmlController extends GenericController {
 		File file = fileChooser.showOpenDialog(stage);
 
 		if (file != null) {
-			//TreeItem<MyFtpFile> item = trvFacturas.getSelectionModel().getSelectedItem();
-			if (ftpLogic.subirArchivo("/", file)) {
-				// Actualizar tabla
-				MyFtpFile ftpFile = new MyFtpFile(file.getName(), file.getAbsolutePath(), false);
-				TreeItem<MyFtpFile> ftpItem = new TreeItem<>(ftpFile);
-				trvFacturas.getRoot().getChildren().add(ftpItem);
-				trvFacturas.refresh();
+			try {
 
-				Alert alert = new Alert(Alert.AlertType.INFORMATION); // Change alert type to CONFIRMATION
-				alert.setHeaderText(null);
-				alert.setContentText("Archivo subido con exito.");
-				alert.showAndWait();
+				TreeItem<MyFtpFile> ftpItem2 = trvFacturas.getSelectionModel().getSelectedItem();
+				if (ftpItem2 == null) {
+					ftpItem2 = trvFacturas.getRoot();
+				}
+				String path = ftpItem2.getValue().getAbsolutePath() + "/" + txtDirectorio.getText();
+				if (ftpLogic.subirArchivo(path, file)) {
+					// Actualizar tabla
+					MyFtpFile ftpFile = new MyFtpFile(file.getName(), file.getAbsolutePath(), false);
+					TreeItem<MyFtpFile> ftpItem = new TreeItem<>(ftpFile);
+					trvFacturas.getRoot().getChildren().add(ftpItem);
+					trvFacturas.refresh();
+
+					MyAlert.showAlert(Alert.AlertType.INFORMATION, "Archivo subido con exito.");
+				} else {
+					throw new BusinessLogicException();
+				}
+			} catch (BusinessLogicException ex) {
+				LOGGER.log(Level.SEVERE, "FacturasDesktopFxmlController: Exception uploading file, {0}.", ex.getMessage());
+				MyAlert.showAlert(Alert.AlertType.ERROR, "Error subiendo el archivo.");
 			}
 		}
 		LOGGER.info("FacturasDesktopFxmlController: Handled subir archivo action.");
 	}
 
+	/**
+	 * Action event handler for download button.
+	 *
+	 * @param event The ActionEvent object for the event.
+	 */
 	@FXML
 	private void handleDescargarAction(ActionEvent event) {
 		LOGGER.info("FacturasDesktopFxmlController: Handling descargar archivo action...");
@@ -139,21 +202,26 @@ public class FacturasDesktopFxmlController extends GenericController {
 			File file = directoryChooser.showDialog(stage);
 
 			TreeItem<MyFtpFile> ftpItem = trvFacturas.getSelectionModel().getSelectedItem();
-			FileOutputStream o = new FileOutputStream(file.getAbsolutePath()+ "/" + ftpItem.getValue().getName());
+			FileOutputStream o = new FileOutputStream(file.getAbsolutePath() + "/" + ftpItem.getValue().getName());
 
 			if (ftpLogic.descargarArchivo(ftpItem.getValue().getAbsolutePath(), o)) {
-				Alert alert = new Alert(Alert.AlertType.INFORMATION); // Change alert type to CONFIRMATION
-				alert.setHeaderText(null);
-				alert.setContentText("Archivo descargado con exito.");
-				alert.showAndWait();
+				MyAlert.showAlert(Alert.AlertType.INFORMATION, "Archivo descargado con exito.");
+			} else {
+				throw new BusinessLogicException();
 			}
-		} catch (FileNotFoundException ex) {
-			Logger.getLogger(FacturasDesktopFxmlController.class.getName()).log(Level.SEVERE, null, ex);
+		} catch (FileNotFoundException | BusinessLogicException ex) {
+			LOGGER.log(Level.SEVERE, "FacturasDesktopFxmlController: Exception downloading file, {0}.", ex.getMessage());
+			MyAlert.showAlert(Alert.AlertType.ERROR, "Error descargando el archivo.");
 		}
 
 		LOGGER.info("FacturasDesktopFxmlController: Handled descargar archivo action.");
 	}
 
+	/**
+	 * Action event handler for deleting button.
+	 *
+	 * @param event The ActionEvent object for the event.
+	 */
 	@FXML
 	private void handleEliminarAction(ActionEvent event) {
 		LOGGER.info("FacturasDesktopFxmlController: Handling eliminar archivo action...");
@@ -161,53 +229,55 @@ public class FacturasDesktopFxmlController extends GenericController {
 		TreeItem<MyFtpFile> ftpItem = trvFacturas.getSelectionModel().getSelectedItem();
 
 		if (ftpItem.getValue().isDirectory()) {
-			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-			alert.setHeaderText(null);
-			alert.setContentText("¿Desea eliminar el directorio definitivamente?");
-			Optional<ButtonType> result = alert.showAndWait();
+			Optional<ButtonType> result = MyAlert.showAlert(Alert.AlertType.CONFIRMATION, "¿Desea eliminar el directorio definitivamente?");
 
 			if (result.get() == ButtonType.OK) {
-				if (ftpItem.getChildren().isEmpty()) {
-					if (ftpLogic.borrarDirectorio(ftpItem.getValue().getAbsolutePath())) {
+				try {
+					if (ftpItem.getChildren().isEmpty()) {
+						if (ftpLogic.borrarDirectorio(ftpItem.getValue().getAbsolutePath())) {
 
-						trvFacturas.getRoot().getChildren().remove(ftpItem);
-						trvFacturas.refresh();
-						alert = new Alert(Alert.AlertType.INFORMATION);
-						alert.setHeaderText(null);
-						alert.setContentText("Directorio borrado con exito.");
-						alert.showAndWait();
+							trvFacturas.getRoot().getChildren().remove(ftpItem);
+							trvFacturas.refresh();
+							MyAlert.showAlert(Alert.AlertType.INFORMATION, "Directorio borrado con exito.");
+						} else {
+							throw new BusinessLogicException();
+						}
+					} else {
+						MyAlert.showAlert(Alert.AlertType.ERROR, "No se pudo borrar el directorio, pruebe a borrar los ficheros que contiene.");
 					}
-				} else {
-
-					alert = new Alert(Alert.AlertType.INFORMATION);
-					alert.setHeaderText(null);
-					alert.setContentText("No se pudo borrar el directorio, pruebe a borrar los ficheros que contiene.");
-					alert.showAndWait();
+				} catch (BusinessLogicException ex) {
+					LOGGER.log(Level.SEVERE, " FacturasDesktopFxmlController: Error deleting directory, {0}.", ex.getMessage());
+					MyAlert.showAlert(Alert.AlertType.ERROR, "Error borrando el directorio.");
 				}
 			}
 		} else {
-			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-			alert.setHeaderText(null);
-			alert.setContentText("¿Desea eliminar el archivo definitivamente?");
-			Optional<ButtonType> result = alert.showAndWait();
+			Optional<ButtonType> result = MyAlert.showAlert(Alert.AlertType.CONFIRMATION, "¿Desea eliminar el archivo definitivamente?");
 
 			if (result.get() == ButtonType.OK) {
 
-				if (ftpLogic.borrarArchivo(ftpItem.getValue().getAbsolutePath())) {
-
-					trvFacturas.getRoot().getChildren().remove(ftpItem);
-					trvFacturas.refresh();
-					LOGGER.info("FacturasDesktopFxmlController: Archivo eliminado con exito.");
-					alert = new Alert(Alert.AlertType.INFORMATION);
-					alert.setHeaderText(null);
-					alert.setContentText("Archivo eliminado con exito.");
-					alert.showAndWait();
+				try {
+					if (ftpLogic.borrarArchivo(ftpItem.getValue().getAbsolutePath())) {
+						trvFacturas.getRoot().getChildren().remove(ftpItem);
+						trvFacturas.refresh();
+						LOGGER.info("FacturasDesktopFxmlController: Archivo eliminado con exito.");
+						MyAlert.showAlert(Alert.AlertType.INFORMATION, "Archivo eliminado con exito.");
+					} else {
+						throw new BusinessLogicException();
+					}
+				} catch (BusinessLogicException ex) {
+					LOGGER.log(Level.SEVERE, "FacturasDesktopFxmlController: Error borrando el archivo, {0}.", ex.getMessage());
+					MyAlert.showAlert(Alert.AlertType.ERROR, "Error borrando el archivo.");
 				}
 			}
 		}
 		LOGGER.info("FacturasDesktopFxmlController: Handled eliminar archivo action.");
 	}
 
+	/**
+	 * Action event handler for creating directory button.
+	 *
+	 * @param event The ActionEvent object for the event.
+	 */
 	@FXML
 	private void handleCrearDirectorioAction(ActionEvent event) {
 		LOGGER.info("FacturasDesktopFxmlController: Handling crear directorio action...");
@@ -218,11 +288,16 @@ public class FacturasDesktopFxmlController extends GenericController {
 				ftpItem = trvFacturas.getRoot();
 			}
 			String path = ftpItem.getValue().getAbsolutePath() + "/" + txtDirectorio.getText();
-			ftpLogic.crearDirectorio(path);
+			try {
+				ftpLogic.crearDirectorio(path);
 
-			TreeItem<MyFtpFile> ti = new TreeItem<>(new MyFtpFile(txtDirectorio.getText(), ftpItem.getValue().getAbsolutePath(), true));
-			ftpItem.getChildren().add(ti);
-			trvFacturas.refresh();
+				TreeItem<MyFtpFile> ti = new TreeItem<>(new MyFtpFile(txtDirectorio.getText(), ftpItem.getValue().getAbsolutePath(), true));
+				ftpItem.getChildren().add(ti);
+				trvFacturas.refresh();
+			} catch (BusinessLogicException ex) {
+				LOGGER.log(Level.SEVERE, "FacturasDesktopFxmlController: Error creating directory, {0}.", ex.getMessage());
+				MyAlert.showAlert(Alert.AlertType.ERROR, "Error creando directorio.");
+			}
 		}
 		LOGGER.info("FacturasDesktopFxmlController: Handled crear directorio action.");
 	}

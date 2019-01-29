@@ -36,35 +36,44 @@ import javafx.stage.WindowEvent;
  */
 public class SignUpDesktopFxmlController extends GenericController {
 
+	/**
+	 * Main pane of the window.
+	 */
 	@FXML
 	private GridPane gpSignUp;
 	/**
-	 * User's fullname UI text field.
+	 * Employee's fullname UI text field.
 	 */
 	@FXML
 	private TextField txtFullname;
 	/**
-	 * User's email UI text field.
+	 * Employee's email UI text field.
 	 */
 	@FXML
 	private TextField txtEmail;
 	/**
-	 * User's login UI text field.
+	 * Employee's login UI text field.
 	 */
 	@FXML
 	private TextField txtLogin;
 	/**
-	 * User's password UI password field.
+	 * Employee's password UI password field.
 	 */
 	@FXML
 	private PasswordField pwdPassword;
 	/**
-	 * User's password confirmation UI password field.
+	 * Employee's password confirmation UI password field.
 	 */
 	@FXML
 	private PasswordField pwdConfirmPassword;
+	/**
+	 * Employee's phone UI text field
+	 */
 	@FXML
 	private TextField txtTelefono;
+	/**
+	 * Employee's birthday UI datepicker
+	 */
 	@FXML
 	private DatePicker dtpFechaDeNacimiento;
 
@@ -102,6 +111,11 @@ public class SignUpDesktopFxmlController extends GenericController {
 	private Label lblErrorTermsOfUse;
 	@FXML
 	private Label lblErrorFullname;
+	/**
+	 * Error label for any error messages.
+	 */
+	@FXML
+	private Label lblErrorLabel;
 
 	/**
 	 * Method for initializing Sign Up Desktop View {@link Stage}.
@@ -109,7 +123,8 @@ public class SignUpDesktopFxmlController extends GenericController {
 	 * @param root The parent object representing root node of view graph.
 	 */
 	public void initStage(Parent root) {
-		LOGGER.info("SignUpDesktopFxmlController::initStage: Initializing stage.");
+		LOGGER.info("SignUpDesktopFxmlController: Initializing stage...");
+
 		// Create a scene associated to the node graph root	
 		Scene scene = new Scene(root);
 		// Associate scene to the stage
@@ -122,12 +137,16 @@ public class SignUpDesktopFxmlController extends GenericController {
 		// Set window's events handlers
 		stage.setOnShowing(this::handleWindowShowing);
 		// Set control events handlers
-		txtFullname.textProperty().addListener(this::textChanged);
-		txtEmail.textProperty().addListener(this::textChanged);
 		txtLogin.textProperty().addListener(this::textChanged);
+		txtEmail.textProperty().addListener(this::textChanged);
 		pwdPassword.textProperty().addListener(this::textChanged);
+		txtFullname.textProperty().addListener(this::textChanged);
+		dtpFechaDeNacimiento.valueProperty().addListener((observable, oldValue, newValue) -> this.textChanged(observable, oldValue, newValue));
+		txtTelefono.textProperty().addListener(this::textChanged);
 		// Show window
 		stage.show();
+
+		LOGGER.info("SignUpDesktopFxmlController: Initialized stage.");
 	}
 
 	/**
@@ -202,6 +221,19 @@ public class SignUpDesktopFxmlController extends GenericController {
 			pwdConfirmPassword.setStyle("");
 			lblErrorPassword.setVisible(false);
 		}
+	}
+
+	/**
+	 * Text changed event handler. It changes the border colors to default and
+	 * hides the error labels when some correction is done on a datepicker.
+	 *
+	 * @param observable The value being observed.
+	 * @param oldValue The old value of the observable.
+	 * @param newValue The new value of the observable.
+	 */
+	private void textChanged(ObservableValue<? extends LocalDate> observable, LocalDate oldValue, LocalDate newValue) {
+		// TODO
+		// Get changes of datepicker
 	}
 
 	/**
@@ -306,6 +338,25 @@ public class SignUpDesktopFxmlController extends GenericController {
 	}
 
 	/**
+	 * Method for validating spanish phone number.
+	 *
+	 * @param telefono Phone number to validate.
+	 * @throws IllegalArgumentException Phone number is not valid.
+	 */
+	private void validateTelefono(String telefono) throws IllegalArgumentException {
+		String PHONE_PATTERN = "^[0-9]{2,3}-? ?[0-9]{6,7}$";
+		Pattern pattern = Pattern.compile(PHONE_PATTERN);
+
+		if (telefono == null || telefono.trim().equals("")) {
+			throw new IllegalArgumentException("* El teléfono no puede estar vacío.");
+		}
+
+		if (!pattern.matcher(telefono).matches()) {
+			throw new IllegalArgumentException("* El teléfono debe ser un número válido.");
+		}
+	}
+
+	/**
 	 * Action event handler for SignUp button. It validates that all fields are
 	 * filled and that they don't have invalid characters. If they are not
 	 * border of the corresponding text fields are red colored and an error
@@ -386,7 +437,8 @@ public class SignUpDesktopFxmlController extends GenericController {
 			empleado.setEmail(txtEmail.getText());
 			empleado.setPassword(pwdPassword.getText());
 			empleado.setFullname(txtFullname.getText());
-			empleado.setFechaDeNacimiento(new Date(dtpFechaDeNacimiento.getValue().toEpochDay()));
+			java.sql.Date d = java.sql.Date.valueOf(dtpFechaDeNacimiento.getValue());
+			empleado.setFechaDeNacimiento(d);
 			empleado.setTelefono(txtTelefono.getText());
 
 			empleado.setStatus(UserStatus.ENABLED);
@@ -465,4 +517,5 @@ public class SignUpDesktopFxmlController extends GenericController {
 		LOGGER.info("SignUpDesktopFxmlController: Opening SignIn action.");
 		openSignInWindow();
 	}
+
 }
