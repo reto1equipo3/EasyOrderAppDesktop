@@ -1,10 +1,11 @@
 package easyorderappdesktop.rest;
 
+import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.GenericType;
 
 /**
  * Jersey REST client generated for REST resource:EmpleadoREST [empleado]<br>
@@ -20,9 +21,18 @@ import javax.ws.rs.core.Response;
  */
 public class EmpleadoRESTClient {
 
+	/**
+	 * Web target object
+	 */
 	private final WebTarget webTarget;
+	/**
+	 * Client object
+	 */
 	private final Client client;
-	private static final String BASE_URI = "http://localhost:8080/EasyOrderAppServer/webresources";
+	/**
+	 * URI from properties' values file
+	 */
+	private static final String BASE_URI = ResourceBundle.getBundle("easyorderappdesktop.config.parameters").getString("RESTful.baseURI");
 
 	/**
 	 * Default constructor.
@@ -108,7 +118,7 @@ public class EmpleadoRESTClient {
 	 * @return All employees
 	 * @throws ClientErrorException Something went wrong
 	 */
-	public <T> T findAll(Class<T> responseType) throws ClientErrorException {
+	public <T> T findAll(GenericType<T> responseType) throws ClientErrorException {
 		WebTarget resource = webTarget;
 		return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
 	}

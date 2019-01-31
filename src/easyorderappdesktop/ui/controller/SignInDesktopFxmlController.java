@@ -1,7 +1,6 @@
 package easyorderappdesktop.ui.controller;
 
 import easyorderappdesktop.businessLogic.BusinessLogicException;
-import easyorderappdesktop.transferObject.Empleado;
 import easyorderappdesktop.utils.MyAlert;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,7 +10,6 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 
@@ -21,7 +19,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;

@@ -18,12 +18,14 @@ import javax.xml.bind.DatatypeConverter;
 
 /**
  * Custom class for cryptography.
+ *
  * @author Imanol
  */
 public class Crypto {
-	
+
 	/**
 	 * Encrypts a password using public key.
+	 *
 	 * @param password Password to encrypt.
 	 * @return Encrypted password.
 	 */
