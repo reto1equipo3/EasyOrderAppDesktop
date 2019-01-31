@@ -118,10 +118,5 @@
             <Insets />
          </GridPane.margin>
       </Label>
-      <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="3" GridPane.columnSpan="6" GridPane.rowIndex="1">
-         <children>
-            <Label fx:id="lblErrorLabel" alignment="CENTER" prefHeight="82.0" prefWidth="588.0" style="-fx-color: red;" text="*Error label" textFill="RED" />
-         </children>
-      </HBox>
    </children>
 </GridPane>

@@ -18,6 +18,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -122,7 +125,7 @@ public class FacturasDesktopFxmlController extends GenericController {
 		return branchItem;
 	}
 
-	private void setTreeView() {
+	private void refreshTreeView() {
 		// Create a custom file object for root
 		MyFtpFile ftpRoot = new MyFtpFile("", "/", true);
 		// Create a TreeItem for root with custom file object
@@ -163,18 +166,18 @@ public class FacturasDesktopFxmlController extends GenericController {
 
 		if (file != null) {
 			try {
-
-				TreeItem<MyFtpFile> ftpItem2 = trvFacturas.getSelectionModel().getSelectedItem();
-				if (ftpItem2 == null) {
-					ftpItem2 = trvFacturas.getRoot();
+				TreeItem<MyFtpFile> ftpItem = trvFacturas.getSelectionModel().getSelectedItem();
+				if (ftpItem == null) {
+					ftpItem = trvFacturas.getRoot();
 				}
-				String path = ftpItem2.getValue().getAbsolutePath() + "/" + txtDirectorio.getText();
+				String path = ftpItem.getValue().getAbsolutePath() + "/" + txtDirectorio.getText();
 				if (ftpLogic.subirArchivo(path, file)) {
 					// Actualizar tabla
 					MyFtpFile ftpFile = new MyFtpFile(file.getName(), file.getAbsolutePath(), false);
-					TreeItem<MyFtpFile> ftpItem = new TreeItem<>(ftpFile);
-					trvFacturas.getRoot().getChildren().add(ftpItem);
-					trvFacturas.refresh();
+					//trvFacturas.getRoot().getChildren().add(new TreeItem<>(ftpFile));
+					ftpItem.getChildren().add(new TreeItem<>(ftpFile));
+					//trvFacturas.refresh();
+					refreshTreeView();
 
 					MyAlert.showAlert(Alert.AlertType.INFORMATION, "Archivo subido con exito.");
 				} else {
@@ -236,8 +239,10 @@ public class FacturasDesktopFxmlController extends GenericController {
 					if (ftpItem.getChildren().isEmpty()) {
 						if (ftpLogic.borrarDirectorio(ftpItem.getValue().getAbsolutePath())) {
 
-							trvFacturas.getRoot().getChildren().remove(ftpItem);
-							trvFacturas.refresh();
+							//trvFacturas.getRoot().getChildren().remove(ftpItem);
+							ftpItem.getChildren().remove(ftpItem);
+							//trvFacturas.refresh();
+							refreshTreeView();
 							MyAlert.showAlert(Alert.AlertType.INFORMATION, "Directorio borrado con exito.");
 						} else {
 							throw new BusinessLogicException();
@@ -256,9 +261,11 @@ public class FacturasDesktopFxmlController extends GenericController {
 			if (result.get() == ButtonType.OK) {
 
 				try {
-					if (ftpLogic.borrarArchivo(ftpItem.getValue().getAbsolutePath())) {
-						trvFacturas.getRoot().getChildren().remove(ftpItem);
-						trvFacturas.refresh();
+					if (ftpLogic.borrarArchivo(ftpItem.getValue().getPath())) {
+						//trvFacturas.getRoot().getChildren().remove(ftpItem);
+						ftpItem.getChildren().remove(ftpItem);
+						//trvFacturas.refresh();
+						refreshTreeView();
 						LOGGER.info("FacturasDesktopFxmlController: Archivo eliminado con exito.");
 						MyAlert.showAlert(Alert.AlertType.INFORMATION, "Archivo eliminado con exito.");
 					} else {
@@ -293,7 +300,10 @@ public class FacturasDesktopFxmlController extends GenericController {
 
 				TreeItem<MyFtpFile> ti = new TreeItem<>(new MyFtpFile(txtDirectorio.getText(), ftpItem.getValue().getAbsolutePath(), true));
 				ftpItem.getChildren().add(ti);
-				trvFacturas.refresh();
+				//trvFacturas.refresh();
+				refreshTreeView();
+
+				txtDirectorio.clear();
 			} catch (BusinessLogicException ex) {
 				LOGGER.log(Level.SEVERE, "FacturasDesktopFxmlController: Error creating directory, {0}.", ex.getMessage());
 				MyAlert.showAlert(Alert.AlertType.ERROR, "Error creando directorio.");

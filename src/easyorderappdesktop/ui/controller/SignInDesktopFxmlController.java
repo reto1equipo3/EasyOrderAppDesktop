@@ -2,6 +2,7 @@ package easyorderappdesktop.ui.controller;
 
 import easyorderappdesktop.businessLogic.BusinessLogicException;
 import easyorderappdesktop.transferObject.Empleado;
+import easyorderappdesktop.utils.MyAlert;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,10 +41,6 @@ import javafx.stage.WindowEvent;
  * @author Imanol
  */
 public class SignInDesktopFxmlController extends GenericController {
-
-	private static final Logger logger = Logger.getLogger("easyorderappclient");
-
-	private Empleado empleado;
 
 	/**
 	 * User's login name UI text field.
@@ -85,10 +82,19 @@ public class SignInDesktopFxmlController extends GenericController {
 	 */
 	@FXML
 	private Label lblErrorPass;
+	/**
+	 * GridPane for the window.
+	 */
 	@FXML
 	private GridPane gpSignIn;
+	/**
+	 * Forgotten password hyperlink.
+	 */
 	@FXML
 	private Hyperlink hpForgottenPassword;
+	/**
+	 * Sign up label
+	 */
 	@FXML
 	private Label lblSignUp;
 
@@ -150,10 +156,6 @@ public class SignInDesktopFxmlController extends GenericController {
 
 		hpSignUp.setMnemonicParsing(true);
 		hpSignUp.setText("Darse de alta");
-
-		txtLogin.setText("imanoltxu");
-		pwdPassword.setText("Abcd*1234");
-
 	}
 
 	/**
@@ -171,35 +173,16 @@ public class SignInDesktopFxmlController extends GenericController {
 			if (chkRememberLogin.isSelected()) {
 				RememberUserLogin();
 			}
-			//GoToUserView();
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
-				alert.setHeaderText(null);
-				alert.setContentText("¡Felicidades! El empleado " + empleado.getLogin() + " ha iniciado sesión correctamente.");
-				alert.showAndWait().filter(response -> response == ButtonType.OK);
+			MyAlert.showAlert(Alert.AlertType.INFORMATION, "¡Bienvenido " + empleado.getLogin() + "!");
 
-				GoToEmpleadoView();
+			GoToEmpleadoView();
 		} catch (BusinessLogicException ex) {
 			LOGGER.log(Level.SEVERE, "SignInDesktopFxmlController: Exception signing in employee, {0}", ex.getMessage());
 
-			// TODO
-			// Diferenciar error por el mensaje de la excepcion
-			lblErrorLogin.setText("*Wrong login.");
-			lblErrorLogin.setVisible(true);
-			lblErrorPass.setText("*Wrong Password.");
-			lblErrorPass.setVisible(true);
-
-			txtLogin.setStyle("-fx-border-color:red;");
-			pwdPassword.setStyle("-fx-border-color:red;");
-
+			txtLogin.clear();
 			txtLogin.requestFocus();
-
-			// Mostrar alerta cuando no sabemos cual ha sido el porque de la excepcion
-			/*
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setHeaderText(null);
-			alert.setContentText("Sorry, something went wrong. Try again later.");
-			alert.showAndWait();
-			 */
+			pwdPassword.clear();
+			MyAlert.showAlert(Alert.AlertType.ERROR, "No se ha podido iniciar sesion. Por favor, revisa tus credenciales.");
 		}
 	}
 
@@ -208,13 +191,18 @@ public class SignInDesktopFxmlController extends GenericController {
 		LOGGER.info("SignInDesktopFxmlController: Handling forgotten password...");
 
 		try {
-			empleadoLogic.recuperarContrasegna(txtLogin.getText());
+			if (!txtLogin.getText().equals("")) {
+				empleadoLogic.recuperarContrasegna(txtLogin.getText());
+				MyAlert.showAlert(Alert.AlertType.INFORMATION, "Se ha enviado un email con su nueva contraseña.");
+			} else {
+				lblErrorLogin.setText("* Introduce un login");
+				txtLogin.setStyle("-fx-border-color:red;");
+			}
 		} catch (BusinessLogicException ex) {
 			LOGGER.log(Level.SEVERE, "SignInFxmlController: Exception restoring password, {0}.", ex.getMessage());
-			// TODO
-			// UI Feedback
+			MyAlert.showAlert(Alert.AlertType.ERROR, "Ha ocurrido un error, por favor intentelo mas tarde.");
 		}
-		
+
 		LOGGER.info("SignInDesktopFxmlController: Handled forgotten password.");
 
 	}
@@ -245,6 +233,7 @@ public class SignInDesktopFxmlController extends GenericController {
 			LOGGER.log(Level.SEVERE,
 				"UI SignInDesktopFxmlController: Error opening SignUp window: {0}",
 				e.getMessage());
+			MyAlert.showAlert(Alert.AlertType.ERROR, "Error abriendo la ventana.");
 		}
 	}
 
@@ -275,22 +264,22 @@ public class SignInDesktopFxmlController extends GenericController {
 
 		//Put Login textField border color to default color
 		if (!txtLogin.getText().trim().isEmpty()) {
-			txtLogin.setStyle("-fx-border-color:AXIS_COLOR;");
+			txtLogin.setStyle("");
 			lblErrorLogin.setVisible(false);
 		}
 		//Put Password textField border color to default color
 		if (!pwdPassword.getText().trim().isEmpty()) {
-			pwdPassword.setStyle("-fx-border-color:AXIS_COLOR;");
+			pwdPassword.setStyle("");
 			lblErrorPass.setVisible(false);
 		}
 
 		//Limit the number of characters on the Login textField
-		if (txtLogin.getLength() == 21) {
-			txtLogin.setText(txtLogin.getText().substring(0, 20));
+		if (txtLogin.getLength() == MAX_LENGTH_LOGIN) {
+			txtLogin.setText(txtLogin.getText().substring(0, MAX_LENGTH_LOGIN));
 		}
 		//Limit the number of characters on the Password passwordField
-		if (pwdPassword.getLength() == 10) {
-			pwdPassword.setText(pwdPassword.getText().substring(0, 10));
+		if (pwdPassword.getLength() == MAX_LENGTH_PASSWORD) {
+			pwdPassword.setText(pwdPassword.getText().substring(0, MAX_LENGTH_PASSWORD));
 		}
 
 	}
@@ -322,6 +311,7 @@ public class SignInDesktopFxmlController extends GenericController {
 			LOGGER.log(Level.SEVERE,
 				"UI SignUpDesktopFxmlController: Error opening UserView window.",
 				e.getMessage());
+			MyAlert.showAlert(Alert.AlertType.ERROR, "Error abriendo la ventana.");
 
 		}
 	}

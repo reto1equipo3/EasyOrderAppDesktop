@@ -209,7 +209,7 @@ public class FTPLogicImplementation implements FTPLogic {
 		try {
 			fileInputStream = new FileInputStream(file);
 			uploaded = ftp.storeFile(path + file.getName(), fileInputStream);
-			
+
 		} catch (IOException ex) {
 			LOGGER.log(Level.SEVERE, "FTPLogicImplementation: Error subiendo archivo, {0}.", ex.getMessage());
 			throw new BusinessLogicException("Error uploading file.");

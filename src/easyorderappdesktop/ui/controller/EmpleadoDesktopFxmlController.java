@@ -1,12 +1,15 @@
 package easyorderappdesktop.ui.controller;
 
 import easyorderappdesktop.businessLogic.BusinessLogicException;
+import easyorderappdesktop.utils.MyAlert;
+import easyorderappdesktop.utils.MyRegex;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -30,23 +33,47 @@ import javafx.stage.WindowEvent;
  */
 public class EmpleadoDesktopFxmlController extends GenericController {
 
+	/**
+	 * Cambiar contrasegna hyperlink.
+	 */
 	@FXML
 	private Hyperlink hpCambiarContrasegna;
-	@FXML
-	private TextField txtLogin;
+	/**
+	 * Text field for email.
+	 */
 	@FXML
 	private TextField txtEmail;
+	/**
+	 * Text field for fullname.
+	 */
 	@FXML
 	private TextField txtFullname;
+	/**
+	 * Text field for phone number.
+	 */
 	@FXML
 	private TextField txtTelefono;
+	/**
+	 * Datepicker for birthdate.
+	 */
 	@FXML
 	private DatePicker dtpFechaDeNacimiento;
+	/**
+	 * Editar and Guardar button.
+	 */
 	@FXML
 	private Button btnEditarGuardar;
+	/**
+	 * Eliminar and Cancelar button.
+	 */
 	@FXML
 	private Button btnEliminarCancelar;
 
+	/**
+	 * Method for initializing SignIn Stage.
+	 *
+	 * @param root The Parent object representing root node of view graph.
+	 */
 	public void initStage(Parent root) {
 		LOGGER.log(Level.INFO, "EmpleadoDesktopFxmlController: Initializing stage.");
 		// Create a scene associated to the node graph root	
@@ -61,16 +88,24 @@ public class EmpleadoDesktopFxmlController extends GenericController {
 		// Set window's events handlers
 		stage.setOnShowing(this::handleWindowShowing);
 		// Set control events handlers
+		txtEmail.textProperty().addListener(this::textChanged);
+		txtFullname.textProperty().addListener(this::textChanged);
+		txtTelefono.textProperty().addListener(this::textChanged);
 
 		// Show window
 		stage.show();
 	}
 
+	/**
+	 * Window event method handler. It implements behavior for WINDOW_SHOWING
+	 * type event.
+	 *
+	 * @param event The window event
+	 */
 	private void handleWindowShowing(WindowEvent event) {
 		LOGGER.log(Level.INFO, "EmpleadoDesktopFxmlController: Setting default window state.");
 
 		// Fill textviews with employee data
-		txtLogin.setText(empleado.getLogin());
 		txtEmail.setText(empleado.getEmail());
 		txtFullname.setText(empleado.getFullname());
 		LocalDate ldFechaDeNacimiento = empleado.getFechaDeNacimiento().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -79,10 +114,34 @@ public class EmpleadoDesktopFxmlController extends GenericController {
 
 	}
 
+	/**
+	 * Text changed event handler. It changes the border colors to default and
+	 * hides the error labels when some correction is done on a textfield.
+	 *
+	 * @param observable The value being observed.
+	 * @param oldValue The old value of the observable.
+	 * @param newValue The new value of the observable.
+	 */
+	private void textChanged(ObservableValue observable, String oldValue, String newValue) {
+		if (!txtEmail.getText().trim().isEmpty()) {
+			txtEmail.setStyle("");
+		}
+		if (!txtFullname.getText().trim().isEmpty()) {
+			txtFullname.setStyle("");
+		}
+		if (!txtTelefono.getText().trim().isEmpty()) {
+			txtTelefono.setStyle("");
+		}
+	}
+
+	/**
+	 * Action event handler for Editar and Guardar actions.
+	 *
+	 * @param event The action event.
+	 */
 	@FXML
 	private void handleEditarGuardarAction(ActionEvent event) {
 		if (btnEditarGuardar.getText().equals("Editar")) {
-			txtLogin.setEditable(true);
 			txtEmail.setEditable(true);
 			txtFullname.setEditable(true);
 			dtpFechaDeNacimiento.setEditable(true);
@@ -103,35 +162,60 @@ public class EmpleadoDesktopFxmlController extends GenericController {
 				if (result.get() == ButtonType.OK) {
 					LOGGER.info("EmpleadoDesktopFxmlController: handling update action.");
 
-					// TODO
 					// Validate fields' input
-					empleado.setLogin(txtLogin.getText());
-					empleado.setEmail(txtEmail.getText());
-					empleado.setFullname(txtFullname.getText());
+					boolean validFields = true;
+					try {
+						MyRegex.validateEmail(txtEmail.getText());
+						empleado.setEmail(txtEmail.getText());
+					} catch (IllegalArgumentException ex) {
+						txtEmail.setStyle("-fx-border-color:red;");
+						validFields = false;
+					}
+					try {
+						MyRegex.validateFullname(txtFullname.getText());
+						empleado.setFullname(txtFullname.getText());
+					} catch (IllegalArgumentException ex) {
+						txtFullname.setStyle("-fx-border-color:red;");
+						validFields = false;
+					}
 					java.sql.Date d = java.sql.Date.valueOf(dtpFechaDeNacimiento.getValue());
 					empleado.setFechaDeNacimiento(d);
-					empleado.setTelefono(txtTelefono.getText());
+					try {
+						MyRegex.validateTelefono(txtTelefono.getText());
+						empleado.setTelefono(txtTelefono.getText());
+						empleado.setTelefono(txtTelefono.getText());
+					} catch (IllegalArgumentException ex) {
+						txtTelefono.setStyle("-fx-border-color:red;");
+						validFields = false;
+					}
 
-					empleadoLogic.updateEmpleado(empleado);
+					if (validFields) {
+						empleadoLogic.updateEmpleado(empleado);
 
-					txtLogin.setEditable(false);
-					txtEmail.setEditable(false);
-					txtFullname.setEditable(false);
-					dtpFechaDeNacimiento.setEditable(false);
-					txtTelefono.setEditable(false);
+						txtEmail.setEditable(false);
+						txtFullname.setEditable(false);
+						dtpFechaDeNacimiento.setEditable(false);
+						txtTelefono.setEditable(false);
 
-					btnEditarGuardar.setText("Editar");
-					btnEliminarCancelar.setText("Eliminar");
+						btnEditarGuardar.setText("Editar");
+						btnEliminarCancelar.setText("Eliminar");
+					}
 					LOGGER.info("EmpleadoDesktopFxmlController: handled update action.");
 				}
 			} catch (BusinessLogicException ex) {
-				Logger.getLogger(EmpleadoDesktopFxmlController.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.log(Level.SEVERE, "EmpleadoDesktopFxmlController: Error updating employee, {0}.", ex.getMessage());
+				MyAlert.showAlert(AlertType.ERROR, "Ha ocurrido un error actualizando los datos, intentelo de nuevo.");
 			}
 
 		}
 
 	}
 
+	/**
+	 * Event handler for Eliminar and Cancelar action.
+	 *
+	 * @param event The action event.
+	 */
 	@FXML
 	private void handleEliminarCancelarAction(ActionEvent event) {
 		if (btnEliminarCancelar.getText().equals("Eliminar")) {
@@ -154,7 +238,6 @@ public class EmpleadoDesktopFxmlController extends GenericController {
 			}
 		} else if (btnEliminarCancelar.getText().equals("Cancelar")) {
 			LOGGER.info("EmpleadoDesktopFxmlController: handled cancel action.");
-			txtLogin.setEditable(false);
 			txtEmail.setEditable(false);
 			txtFullname.setEditable(false);
 			dtpFechaDeNacimiento.setEditable(false);
@@ -186,6 +269,11 @@ public class EmpleadoDesktopFxmlController extends GenericController {
 		}
 	}
 
+	/**
+	 * Action event handler for Cambiar contrasegna action.
+	 *
+	 * @param event The action event.
+	 */
 	@FXML
 	private void handleCambiarContrasegnaAction(ActionEvent event) {
 		LOGGER.info("EmpleadoDesktopFxmlController: Handling cambiar contrasegna action...");

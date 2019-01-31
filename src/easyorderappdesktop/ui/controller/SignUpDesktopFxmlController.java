@@ -4,7 +4,7 @@ import easyorderappdesktop.businessLogic.BusinessLogicException;
 import easyorderappdesktop.transferObject.Empleado;
 import easyorderappdesktop.transferObject.UserPrivilege;
 import easyorderappdesktop.transferObject.UserStatus;
-import java.io.IOException;
+import easyorderappdesktop.utils.MyAlert;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.logging.Level;
@@ -12,12 +12,10 @@ import java.util.regex.Pattern;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -76,7 +74,6 @@ public class SignUpDesktopFxmlController extends GenericController {
 	 */
 	@FXML
 	private DatePicker dtpFechaDeNacimiento;
-
 	/**
 	 * Sign up button.
 	 */
@@ -87,9 +84,6 @@ public class SignUpDesktopFxmlController extends GenericController {
 	 */
 	@FXML
 	private Hyperlink hpSignIn;
-	/**
-	 * Error label for fullname field.
-	 */
 	/**
 	 * Error label for email field.
 	 */
@@ -106,16 +100,10 @@ public class SignUpDesktopFxmlController extends GenericController {
 	@FXML
 	private Label lblErrorPassword;
 	/**
-	 * Error label for terms of use checkbox.
+	 * Error label for fullname
 	 */
-	private Label lblErrorTermsOfUse;
 	@FXML
 	private Label lblErrorFullname;
-	/**
-	 * Error label for any error messages.
-	 */
-	@FXML
-	private Label lblErrorLabel;
 
 	/**
 	 * Method for initializing Sign Up Desktop View {@link Stage}.
@@ -179,16 +167,6 @@ public class SignUpDesktopFxmlController extends GenericController {
 		btnSignUp.setText("_Darse de alta");
 		hpSignIn.setMnemonicParsing(true);
 		hpSignIn.setText("_Iniciar sesión");
-
-		// TODO
-		// DELETE THIS
-		txtLogin.setText("imanol02");
-		txtEmail.setText("imanol02@gmail.com");
-		pwdPassword.setText("Abcd*1234");
-		pwdConfirmPassword.setText("Abcd*1234");
-		txtFullname.setText("imanol");
-		txtTelefono.setText("651511511");
-		dtpFechaDeNacimiento.setValue(LocalDate.now());
 	}
 
 	/**
@@ -220,6 +198,9 @@ public class SignUpDesktopFxmlController extends GenericController {
 			pwdPassword.setStyle("");
 			pwdConfirmPassword.setStyle("");
 			lblErrorPassword.setVisible(false);
+		}
+		if (!txtTelefono.getText().trim().isEmpty()) {
+			txtTelefono.setStyle("");
 		}
 	}
 
@@ -372,6 +353,17 @@ public class SignUpDesktopFxmlController extends GenericController {
 		// Boolean to check if all fields are filled correctly
 		boolean validFields = true;
 
+		// Validate phone number
+		try {
+			validateTelefono(txtTelefono.getText());
+		} catch (IllegalArgumentException e) {
+			LOGGER.log(Level.SEVERE, "SignUpDesktopFxmlController: {0}", e.getMessage());
+
+			txtTelefono.setStyle("-fx-border-color:red;");
+			txtTelefono.requestFocus();
+
+			validFields = false;
+		}
 		// Validate password
 		try {
 			validatePassword(pwdPassword.getText(), pwdConfirmPassword.getText());
@@ -432,57 +424,34 @@ public class SignUpDesktopFxmlController extends GenericController {
 		// If all fields are filled correctly sign up the user
 		if (validFields) {
 			// Create an employee to encapsulate all the data
-			Empleado empleado = new Empleado();
-			empleado.setLogin(txtLogin.getText());
-			empleado.setEmail(txtEmail.getText());
-			empleado.setPassword(pwdPassword.getText());
-			empleado.setFullname(txtFullname.getText());
+			Empleado emple = new Empleado();
+			emple.setLogin(txtLogin.getText());
+			emple.setEmail(txtEmail.getText());
+			emple.setPassword(pwdPassword.getText());
+			emple.setFullname(txtFullname.getText());
 			java.sql.Date d = java.sql.Date.valueOf(dtpFechaDeNacimiento.getValue());
-			empleado.setFechaDeNacimiento(d);
-			empleado.setTelefono(txtTelefono.getText());
+			emple.setFechaDeNacimiento(d);
+			emple.setTelefono(txtTelefono.getText());
 
-			empleado.setStatus(UserStatus.ENABLED);
-			empleado.setPrivilege(UserPrivilege.USER);
-			empleado.setLastAccess(new Date());
-			empleado.setLastPasswordChange(new Date());
+			emple.setStatus(UserStatus.ENABLED);
+			emple.setPrivilege(UserPrivilege.USER);
+			emple.setLastAccess(new Date());
+			emple.setLastPasswordChange(new Date());
 
 			// Sign up the new employee
 			try {
-				LOGGER.log(Level.INFO, "SignUpDesktopFxmlController: Signing up employee {0}.", empleado.getLogin());
-				empleadoLogic.createEmpleado(empleado);
+				LOGGER.log(Level.INFO, "SignUpDesktopFxmlController: Signing up employee {0}.", emple.getLogin());
+				empleadoLogic.createEmpleado(emple);
 				LOGGER.log(Level.INFO, "SignUpDesktopFxmlController: Signed up employee.");
-				Alert alert = new Alert(Alert.AlertType.INFORMATION);
-				alert.setHeaderText(null);
-				alert.setContentText("¡Felicidades! El empleado " + empleado.getLogin() + " se ha dado de alta correctamente.");
-				alert.showAndWait().filter(response -> response == ButtonType.OK).ifPresent(response -> stage.hide());
+				MyAlert.showAlert(Alert.AlertType.INFORMATION, "¡Bienvenido a bordo, " + emple.getLogin() + "!");
 
 				// If user is signed up correctly open SignIn window
 				openSignInWindow();
 			} catch (BusinessLogicException ex) {
 				LOGGER.log(Level.SEVERE, "SignUpDesktopFxmlController: Exception signing up employee, {0}.", ex.getMessage());
 
-				// TODO
-				// Show an error feedback
+				MyAlert.showAlert(Alert.AlertType.ERROR, "Ha ocurrido un error durante el registro, prueba con otro login o intentalo mas tarde.");
 			}
-
-			/*
-			} catch (LoginExistingException e) {
-				LOGGER.log(Level.SEVERE, "Sign Up controller::handleSignUpAction: {0}", e.getMessage());
-				lblErrorLogin.setText("* Login already exists.");
-				lblErrorLogin.setVisible(true);
-			} catch (EmailNotUniqueException e) {
-				LOGGER.log(Level.SEVERE, "Sign Up controller::handleSignUpAction: {0}", e.getMessage());
-				lblErrorEmail.setText("* Email already used.");
-				lblErrorEmail.setVisible(true);
-			} catch (DatabaseException e) {
-				LOGGER.log(Level.SEVERE, "Sign Up controller::handleSignUpAction: {0}", e.getMessage());
-
-				Alert alert = new Alert(Alert.AlertType.ERROR);
-				alert.setHeaderText(null);
-				alert.setContentText("Sorry, something went wrong. Try again.");
-				alert.showAndWait();
-			}
-			 */
 		}
 	}
 
@@ -491,6 +460,7 @@ public class SignUpDesktopFxmlController extends GenericController {
 	 */
 	private void openSignInWindow() {
 		LOGGER.info("SignUpDesktopFxmlController: Opening SignIn window action.");
+		/*
 		try {
 			// Load node graph from fxml file
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/easyorderappdesktop/ui/fxml/SignInDesktopFXMLDocument.fxml"));
@@ -500,11 +470,14 @@ public class SignUpDesktopFxmlController extends GenericController {
 			controller.setEmpleadoLogic(empleadoLogic);
 			// Initialize stage
 			controller.initStage(root);
-			// Hide sign up stage
-			//stage.hide();
+		 */
+		// Hide sign up stage
+		stage.hide();
+		/*
 		} catch (IOException ex) {
 			LOGGER.log(Level.SEVERE, "SignUpDesktopFxmlController: Error opening SignIn window.", ex.getMessage());
 		}
+		 */
 	}
 
 	/**

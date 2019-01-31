@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package easyorderappdesktop.utils;
 
 import java.io.FileInputStream;
@@ -11,10 +6,8 @@ import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
@@ -24,12 +17,16 @@ import javax.crypto.NoSuchPaddingException;
 import javax.xml.bind.DatatypeConverter;
 
 /**
- *
+ * Custom class for cryptography.
  * @author Imanol
  */
 public class Crypto {
 	
-	private static final Logger LOGGER = Logger.getLogger("easyorderappserver");
+	/**
+	 * Encrypts a password using public key.
+	 * @param password Password to encrypt.
+	 * @return Encrypted password.
+	 */
 	public static String encryptPassword(String password) {
 		String encryptedPassword = null;
 
